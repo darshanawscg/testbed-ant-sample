@@ -1,55 +1,28 @@
-<project default="all">
-  <target name="compile"> <mkdir dir="build/classes"/>
-    <javac srcdir="src" destdir="build/classes">
-      <compilerArg value="-Xlint"/>
-    </javac>
-  </target>
-  <target name="jar" depends="compile">
-    <jar file="build/app.jar">
-      <fileset dir="build/classes"/>
-    </jar>
-  </target>
-  <target name="test" depends="compile">
-    <mkdir dir="build/test-classes"/>
-    <javac srcdir="test" destdir="build/test-classes" debug="on">
-      <classpath>
-        <pathelement path="build/classes"/>
-        <fileset dir="lib" includes="*.jar"/>
-      </classpath>
-    </javac>
-
-    <mkdir dir="build/test-reports"/>
-    <junit printsummary="true">
-      <classpath>
-        <pathelement path="build/test-classes"/>
-        <pathelement path="build/classes"/>
-        <fileset dir="lib" includes="*.jar"/>
-      </classpath>
-      <formatter type="xml"/>
-      <batchtest todir="build/test-reports">
-        <fileset dir="test" includes="**/*Test.java"/>
-      </batchtest>
-    </junit>
-  </target>
-  <target name="javadoc">
-    <mkdir dir="build/javadoc"/>
-    <javadoc destdir="build/javadoc">
-      <fileset dir="src"/>
-    </javadoc>
-  </target>
-  <target name="findbugs">
-    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
-      <classpath>
-        <pathelement path="lib/findbugs/lib/findbugs.jar"/>
-      </classpath>
+<!-- build.xml -->
+<project name="My Project" default="all" basedir="." xmlns:sonar="antlib:org.sonar.ant">
+...
+  
+<!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
+<property name="sonar.host.url" value="http://localhost:9000" />
+ 
+...
+  
+<!-- Define the SonarQube project properties -->
+<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />
+<property name="sonar.projectName" value="Example of SonarScanner for Ant Usage" />
+<property name="sonar.projectVersion" value="1.0" />
+<property name="sonar.sources" value="src" />
+<property name="sonar.java.binaries" value="build" />
+<property name="sonar.java.libraries" value="lib/*.jar" />
+...
+ 
+<!-- Define SonarScanner for Ant Target -->
+<target name="sonar">
+    <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+        <!-- Update the following line, or put the "sonarqube-ant-task-*.jar" file in your "$HOME/.ant/lib" folder -->
+        <classpath path="path/to/sonar/ant/task/lib/sonarqube-ant-task-*.jar" />
     </taskdef>
-    <findbugs home="lib/findbugs" outputFile="build/findbugs.xml">
-      <sourcePath path="src"/>
-      <class location="build/classes"/>
-    </findbugs>
-  </target>
-  <target name="clean">
-    <delete dir="build"/>
-  </target>
-  <target name="all" depends="jar,test,javadoc,findbugs"/>
-</project>
+ 
+    <!-- Execute SonarScanner for Ant Analysis -->
+    <sonar:sonar />
+</target>
